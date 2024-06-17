@@ -1,67 +1,44 @@
-const express = require("express")
-const path = require("path"); // Add this line
-const quotesPath = path.join(__dirname, "quotes.json"); // Adjust the path accordingly
-const quotes = require(quotesPath);
-const app = express()
-const PORT = 80
-
-app.listen(
-    PORT,
-    () => {
-        console.log(`🚀 Server Started at port ${PORT}`)
-    }
-);
-
-
-
-app.get("/", (req, res) => {
-    // res.json(
-    //     {
-    //         status: 200,
-    //         message: "API is working as expected",
-    //         status_code: "ok",
-    //     }
-    // )
-
-    // res.sendStatus(200)
-    res.sendFile(__dirname + "/index.html")
-    // res.redirect("https://github.com/mudroljub/programming-quotes-api")
-})
-
-
-app.get("/quotes", (req, res) => {
-    res.json(quotes)
-})
-
-
-app.get("/quotes/random", (req, res) => {
-    const randomIndex = Math.round(Math.random() * quotes.length) // generate a random index on basis of quotes array length
-    const randomQuote = quotes[randomIndex] // get a random quote using a random index
-    res.json(randomQuote)
-    // res.sendStatus(200)
-})
-
-app.get("/quotes/:id", (req, res) => {
-
-    const quoteByID = quotes.filter(item => item.id === req.params.id)[0] || null;
-    if(quoteByID) {
-        res.json(quoteByID)
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const path_1 = __importDefault(require("path"));
+const quotes_json_1 = __importDefault(require("./quotes.json"));
+const app = (0, express_1.default)();
+const PORT = 80;
+app.listen(PORT, () => {
+    console.log(`🚀 Server Started at port ${PORT}`);
+});
+app.get('/', (req, res) => {
+    res.sendFile(path_1.default.join(__dirname, '/index.html'));
+});
+app.get('/quotes', (req, res) => {
+    res.json(quotes_json_1.default);
+});
+app.get('/quotes/random', (req, res) => {
+    const randomIndex = Math.floor(Math.random() * quotes_json_1.default.length);
+    const randomQuote = quotes_json_1.default[randomIndex];
+    res.send(randomQuote);
+});
+app.get('/quotes/:id', (req, res) => {
+    const id = req.params.id;
+    const quote = quotes_json_1.default.find((quote) => quote.id === id);
+    if (quote) {
+        res.json(quote);
     }
     else {
-        res.sendStatus(404)
+        res.status(404).json({ error: 'quote not found!' });
     }
-})
-
-
-app.get("/quotes/author/:authorname", (req, res) => {
-    const reqAuthorName = String(req.params.authorname).trim()
-    const quotesByAuthor = quotes.filter(item => item.author.toLowerCase() === reqAuthorName.toLowerCase()) || null;
-    if(quotesByAuthor.length !== 0) {
-        res.json(quotesByAuthor)
+});
+app.get('/quotes/author/:author', (req, res) => {
+    const author = req.params.author;
+    const authorQuotes = quotes_json_1.default.filter((quote) => quote.author.toLowerCase() === author.toLowerCase());
+    if (authorQuotes) {
+        res.json(authorQuotes);
     }
     else {
-        res.sendStatus(404)
+        res.status(404).json({ error: 'quote not found!' });
     }
-
-})
-
+});
